@@ -12,22 +12,36 @@ jobs:
     steps:
       - name: echo github content
         run: |
-            echo ${{ github }}
+            echo ${{ github.ref }}
 
   action_trigger:
+    if:  startsWith(github.ref, 'refs/tags/cms-frontend/') 
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
     steps: 
-      - name: 从tag中解析出当前构建的分支, 仓库等, 并暴露到环境变量中
+      - name: get tag info
         uses: MashyChen/tag-parse-action@main
         with:
-          # TODO
           githubToken: ${{ secrets.ACCESS_TOKEN }}
 
-      - name: 拉取私有仓库的代码
+      - name: checkout code
         uses: actions/checkout@v4
         with:
           repository: SeeChange-edu/${{ env.REPOSITORY }}
-          # TODO
           token: ${{ secrets.ACCESS_TOKEN }}
           ref: ${{ env.BRANCH }}
+
+      - name: setup nodejs
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: yarn
+
+      - name: Build Yarn
+        run: |
+              yarn --frozen-lockfile
+              cp ./env/${{ env.ACTIVE }}.env .env.production
+              yarn buildDev
+
           
