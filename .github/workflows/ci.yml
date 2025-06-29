@@ -9,13 +9,6 @@ concurrency:
   group: ${{github.ref}}
   cancel-in-progress: true
 
-env:
-  NAME: cms-dev
-  ACTIVE: dev
-  IMAGE: registry.digitalocean.com/seechange/cms:dev
-  PORT: 3000
-  OUT_PORT: 13003
-
 jobs:
   action_trigger:
     if:  startsWith(github.ref, 'refs/tags/cms-frontend/') 
@@ -27,6 +20,7 @@ jobs:
         uses: MashyChen/tag-parse-action@main
         with:
           githubToken: ${{ secrets.ACCESS_TOKEN }}
+          type: parse
 
       - name: checkout code
         uses: actions/checkout@v4
@@ -44,7 +38,8 @@ jobs:
       - name: Build Yarn
         run: |
             yarn --frozen-lockfile
-            cp ./env/${{ env.ACTIVE }}.env .env.production
+            echo ${{ env.PUSHREF }}
+            cp ./env/${{ env.PUSHREF }}.env .env.production
             yarn build
 
           
