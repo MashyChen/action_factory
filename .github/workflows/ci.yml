@@ -9,10 +9,13 @@ concurrency:
 jobs:
   console:
     runs-on: ubuntu-latest
+    steps:
+      - name: echo github content
+        run |
+            echo ${{ github }}
+
   action_trigger:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
     steps: 
       - name: 从tag中解析出当前构建的分支, 仓库等, 并暴露到环境变量中
         uses: MashyChen/tag-parse-action@main
@@ -21,7 +24,7 @@ jobs:
           githubToken: ${{ secrets.ACCESS_TOKEN }}
 
       - name: 拉取私有仓库的代码
-        uses: actions/checkout@master
+        uses: actions/checkout@v4
         with:
           repository: SeeChange-edu/${{ env.REPOSITORY }}
           # TODO
