@@ -41,7 +41,6 @@ jobs:
       - name: Build Yarn
         run: |
               yarn --frozen-lockfile
-              cp ./env/${{ env.ACTIVE }}.env .env.production
               yarn buildDev
 
           
