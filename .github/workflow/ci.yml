@@ -1,0 +1,30 @@
+name: Build and Push dist
+on:
+  release:
+    types: [created]
+# 使用并发取消任何当前作业或运行
+concurrency:
+  group: ${{github.ref}}
+  cancel-in-progress: true
+jobs:
+  console:
+    runs-on: ubuntu-latest
+  action_trigger:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: fals
+    steps: 
+      - name: 从tag中解析出当前构建的分支, 仓库等, 并暴露到环境变量中
+        uses: MashyChen/tag-parse-action@main
+        with:
+          # TODO
+          githubToken: ${{ secrets.ACCESS_TOKEN }}
+
+      - name: 拉取私有仓库的代码
+        uses: actions/checkout@master
+        with:
+          repository: SeeChange-edu/${{ env.REPOSITORY }}
+          # TODO
+          token: ${{ secrets.ACCESS_TOKEN }}
+          ref: ${{ env.BRANCH }}
+          
